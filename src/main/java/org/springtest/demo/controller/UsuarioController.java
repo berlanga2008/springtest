@@ -1,8 +1,10 @@
 package org.springtest.demo.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springtest.demo.dto.UsuarioDto;
 import org.springtest.demo.model.Usuario;
 import org.springtest.demo.repository.UsuarioRepository;
+import org.springtest.demo.repository.UsuarioObjRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,9 +14,11 @@ import java.util.List;
 public class UsuarioController {
 
     private final UsuarioRepository repository;
+    private final UsuarioObjRepository repositoryObj;
 
-    public UsuarioController(UsuarioRepository repository) {
+    public UsuarioController(UsuarioRepository repository, UsuarioObjRepository repositoryObj) {
         this.repository = repository;
+        this.repositoryObj = repositoryObj;
     }
 
     // Obtener todos los usuarios
@@ -64,6 +68,12 @@ public class UsuarioController {
         repository.actualizarDescripcionUsuario(id, nuevaDescripcion);
 
         return ResponseEntity.ok("Descripción actualizada correctamente para el usuario con ID " + id);
+    }
+    // Actualizar usuario pasando un OBJ_USUARIO
+    @PutMapping("/obj")
+    public ResponseEntity<String> actualizarUsuarioObj(@RequestBody UsuarioDto usuario) {
+        repositoryObj.actualizarUsuarioObj(usuario);
+        return ResponseEntity.ok("Usuario actualizado correctamente usando OBJ_USUARIO");
     }
 
 }

@@ -1,12 +1,9 @@
 CREATE OR REPLACE PACKAGE PKG_OBJ_USUARIOS AS
 
-    -- Actualizar descripción por ID
-    PROCEDURE ACTUALIZAR_DESCRIPCION (
-        p_id IN USERS.ID%TYPE,
-        p_descripcion IN USERS.DESCRIPCION%TYPE
+    PROCEDURE ACTUALIZAR_USUARIO_OBJ (
+        p_usuario IN OBJ_USUARIO
     );
 
-    -- Obtener usuario como OBJ_USUARIO
     FUNCTION OBTENER_USUARIO (
         p_id IN USERS.ID%TYPE
     ) RETURN OBJ_USUARIO;
@@ -14,42 +11,46 @@ CREATE OR REPLACE PACKAGE PKG_OBJ_USUARIOS AS
 END PKG_OBJ_USUARIOS;
 /
 
-CREATE OR REPLACE PACKAGE BODY PKG_OBJ_USUARIOS AS
 
-    PROCEDURE ACTUALIZAR_DESCRIPCION (
-        p_id IN USERS.ID%TYPE,
-        p_descripcion IN USERS.DESCRIPCION%TYPE
+create OR REPLACE PACKAGE BODY PKG_OBJ_USUARIOS AS
+
+    PROCEDURE ACTUALIZAR_USUARIO_OBJ (
+        p_usuario IN OBJ_USUARIO
     )
     AS
-BEGIN
-UPDATE USERS
-SET DESCRIPCION = p_descripcion
-WHERE ID = p_id;
+    BEGIN
+        UPDATE USERS
+        SET
+            NOMBRE = p_usuario.NOMBRE,
+            EMAIL = p_usuario.EMAIL,
+            DESCRIPCION = p_usuario.DESCRIPCION
+        WHERE ID = p_usuario.ID;
 
-IF SQL%ROWCOUNT = 0 THEN
-            RAISE_APPLICATION_ERROR(-20001, 'Usuario no encontrado con ID: ' || p_id);
-END IF;
+        IF SQL%ROWCOUNT = 0 THEN
+            RAISE_APPLICATION_ERROR(-20002, 'Usuario no encontrado con ID: ' || p_usuario.ID);
+        END IF;
 
-COMMIT;
-END ACTUALIZACION_DESCRIPCION;
+        COMMIT;
+    END ACTUALIZAR_USUARIO_OBJ;
 
 
+    -- ✅ Función que devuelve un usuario como objeto
     FUNCTION OBTENER_USUARIO (
         p_id IN USERS.ID%TYPE
     ) RETURN OBJ_USUARIO
     AS
         v_obj OBJ_USUARIO;
-BEGIN
-SELECT OBJ_USUARIO(ID, NOMBRE, EMAIL, DESCRIPCION)
-INTO v_obj
-FROM USERS
-WHERE ID = p_id;
+    BEGIN
+        SELECT OBJ_USUARIO(ID, NOMBRE, EMAIL, DESCRIPCION)
+        INTO v_obj
+        FROM USERS
+        WHERE ID = p_id;
 
-RETURN v_obj;
-EXCEPTION
+        RETURN v_obj;
+    EXCEPTION
         WHEN NO_DATA_FOUND THEN
             RETURN NULL;
-END OBTENER_USUARIO;
+    END OBTENER_USUARIO;
 
 END PKG_OBJ_USUARIOS;
 /
