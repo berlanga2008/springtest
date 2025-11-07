@@ -1,5 +1,6 @@
 package org.springtest.demo.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springtest.demo.model.Usuario;
 import org.springtest.demo.repository.UsuarioRepository;
 import org.springframework.web.bind.annotation.*;
@@ -54,4 +55,15 @@ public class UsuarioController {
         repository.deleteById(id);
         return "Usuario eliminado con ID: " + id;
     }
+
+    @PutMapping("/{id}/descripcion")
+    public ResponseEntity<String> actualizarDescripcion(
+            @PathVariable Long id,
+            @RequestBody String nuevaDescripcion) {
+
+        repository.actualizarDescripcionUsuario(id, nuevaDescripcion);
+
+        return ResponseEntity.ok("Descripción actualizada correctamente para el usuario con ID " + id);
+    }
+
 }
